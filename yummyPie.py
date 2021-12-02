@@ -5,7 +5,8 @@ import datetime
 import git
 import os
 import git
-from tkinter import *
+import pyglet
+from pyglet.window import Platform
 
 dir = os.path.dirname(os.path.realpath(__file__))
 
@@ -18,8 +19,7 @@ with open(os.path.join(dir, "dinnerTime.txt"), "r") as f:
     timestr = f.read()
     #####################################################04/02/22 04:03
     t = time.mktime(datetime.datetime.strptime(timestr, "%m/%d/%y %H:%M:%S").timetuple())
-
-print(t)
+    #t += 5*3600 #only for replit, thinks we are in london
 
 def pull():
     global time, dir, repo
@@ -29,6 +29,7 @@ def pull():
             timestr = f.read()
             #####################################################04/02/22 04:03
             t = time.mktime(datetime.datetime.strptime(timestr, "%d/%m/%y %H:%M:%S").timetuple())
+            #t += 5*3600 #only for replit, thinks we are in london
     except:
        pass
   
@@ -37,24 +38,23 @@ while time.time() < t:
     if time.time() - lastpull > 4*60*60:
         pull()
         lastpull = time.time()
-print("done")
-def updateGif(i, label):
-    try:
-        frame = PhotoImage(file = os.path.join(dir, "test.gif"), format = "gif -index %i" %(i))
-        label.configure(image = frame)
-        label.image = frame
-    except:
-        i = 0
-        frame = PhotoImage(file = os.path.join(dir, "test.gif"), format = "gif -index %i" %(i))
-        label.configure(image = frame)
-        label.image = frame
-    root.after(100, updateGif, i + 1, label)
-    
+
 if time.time() < t + 10*60*60:
-    root = Tk()
-    #root.attributes("-zoomed", True)
-    label = Label(root)
-    label.pack()
-    root.after(0, updateGif, 0, label)
-    #root.attributes("-fullscreen", True)
-    root.mainloop()
+    monitor = Platform().get_default_display().get_default_screen()
+
+    sprite = pyglet.sprite.Sprite(pyglet.resource.animation(os.path.join(dir, "text.gif")))
+    H_ratio = max(sprite.height, monitor.height) / min(sprite.height, monitor.height)
+    W_ratio = max(sprite.width, monitor.width) / min(sprite.width, monitor.width)
+
+    sprite.scale = min(H_ratio, W_ratio)
+
+    window = pyglet.window.Window(width=monitor.width, height=monitor.height, fullscreen=True)
+
+    pyglet.gl.glClearColor(1, 1, 1, 1)
+
+    @window.event
+    def on_draw():
+        window.clear()
+        sprite.draw()
+
+    pyglet.app.run()
