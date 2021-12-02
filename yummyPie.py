@@ -29,19 +29,17 @@ while time.time() < t or t <= 0:
     pull()
     lastpull = time.time()
 
-def updateGif(ind, label):
-  frame = frames[ind]
-    ind += 1
-    if ind == frameCnt:
-        ind = 0
-    label.configure(image=frame)
-    root.after(100, update, ind, label)
+def updateGif(i, label):
+  try:
+    frame = PhotoImage(file = os.path.join(dir, "raspberry.gif", format = "gif -index %i" %(i)))
+  except:
+    i = 0
+    frame = PhotoImage(file = os.path.join(dir, "raspberry.gif", format = "gif -index %i" %(i)))
+  root.after(100, update, i + 1, label)
     
 if time.time() < t + 10*60*60:
   root = Tk()
   root.attributes("-zoomed", True)
-  gifFrames = 10
-  gif = [PhotoImage(file = os.path.join(dir, "raspberry.gif", format = "gif -index %i" %(i))) for i in range(gifFrames)]
   label = Label(root)
   label.pack()
   root.after(0, updateGif, 0, label)
