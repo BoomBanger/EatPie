@@ -2,7 +2,6 @@ import time
 time.sleep(5)
 
 import datetime
-import git
 import os
 import git
 import pyglet
